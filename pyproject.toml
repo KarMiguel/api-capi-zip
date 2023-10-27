@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "api-capi-zip"
+version = "0.1.0"
+description = ""
+authors = ["Aristeu <aristeuneto13@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<=3.13"
+fastapi = "^0.104.0"
+pydantic-settings = "^2.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

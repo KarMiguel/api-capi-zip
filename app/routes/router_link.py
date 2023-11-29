@@ -22,7 +22,7 @@ def short_link(link: LinkShortOut, user_login: UserModel = Depends(obter_usuario
 
     link_short_exist = RepositoryLink(db_session=db_session).obter_short_link_generate(link.link_long)
 
-    link_novo = LinkShortIn(link_long=link.link_long, short_link="https://cap-zip.com/5dsf4")  
+    link_novo = LinkShortIn(link_long=link.link_long, short_link="")  
    
     if link_short_exist:
         link_novo.short_link = link_short_exist

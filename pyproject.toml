@@ -1,13 +1,12 @@
 [tool.poetry]
-name = "api-capi-zip-develop"
-version = "2"
-description = "encurtador de link"
-authors = ["Carlos Miguel"]
+name = "api-xapi-zip"
+version = "0.1.0"
+description = "encurtador link"
+authors = ["KarMiguel <carlosmiguel.dsa12@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-<<<<<<< HEAD
-python = "^3.11"
+python = "^3.12"
 fastapi = "^0.104.1"
 uvicorn = "^0.24.0.post1"
 sqlalchemy = "^2.0.23"
@@ -17,19 +16,11 @@ passlib = "^1.7.4"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
 psycopg2-binary = "^2.9.9"
-=======
-python = ">=3.11,<=3.13"
-fastapi = "^0.104.0"
-pydantic-settings = "^2.0.3"
-pytz = "^2023.3.post1"
-python-dateutil = "^2.8.2"
-uvicorn = {extras = ["standard"], version = "^0.23.2"}
->>>>>>> af45e0a3df9361f173cdc97fcb25d30f15bdd414
+pydantic = "^2.5.1"
+pydantic-settings = "^2.1.0"
+python-dotenv = "^1.0.0"
+bcrypt = "^4.0.1"
 
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.10.1"
-pytest = "^7.4.3"
 
 [build-system]
 requires = ["poetry-core"]

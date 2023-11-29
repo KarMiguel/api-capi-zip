@@ -10,19 +10,19 @@ class StatusReset(Enum):
     done = 'done'
     send = 'send'
 
-StatusResetType = pgEnum(StatusReset,name='status_reset',metadata = Base.metadata)
+StatusResetType = pgEnum(StatusReset, name='status_reset', metadata=Base.metadata)
+
 
 class UserModel(Base):
     __tablename__ = 'user'
 
     id : Mapped[int] = mapped_column(primary_key=True,autoincrement=True,nullable=False)
-    username :Mapped[str] = mapped_column(nullable=False,unique =True)
+    email :Mapped[str] = mapped_column(nullable=False,unique =True)
     name : Mapped[str] = mapped_column(nullable=False)
     created_at : Mapped[datetime] = mapped_column(server_default=text('CURRENT_TIMESTAMP'), nullable=False)
 
     auth : Mapped["AuthModel"]= relationship( back_populates="user")
-    reset_passwords : Mapped["ResetPassword"] = relationship( back_populates="user")
-
+    link_short: Mapped["LinkShortModel"] =  relationship( back_populates="user")
 
 class AuthModel(Base):
     __tablename__ = 'auth'
@@ -31,14 +31,12 @@ class AuthModel(Base):
 
     user : Mapped["UserModel"] = relationship (back_populates="auth")
 
-class ResetPassword(Base):
-    __tablename__ = 'reset_password'
+class LinkShortModel(Base):
+    __tablename__ = 'link_short'
+    
+    user_id : Mapped[int] = mapped_column(ForeignKey('user.id'),nullable=False)
+    link_long : Mapped[str]= mapped_column(nullable=False)
+    short_link: Mapped[str]= mapped_column(primary_key=True,nullable=False,unique=True)
 
-    id : Mapped[int] = mapped_column(primary_key=True,autoincrement=True,nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id',ondelete='CASCADE'),nullable=False)
-    status  = mapped_column(StatusResetType,nullable=False)
-    code : Mapped[str]= mapped_column(nullable=False)
-
-    user : Mapped["UserModel"] = relationship  (back_populates="reset_passwords")
-
+    user : Mapped["UserModel"] = relationship (back_populates="link_short")
 

@@ -1,0 +1,12 @@
+docker run --name cap_zip -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=adminpass -d postgres:latest
+docker exec -it api-capi-zip-develop-postgresql-1  psql -U admin -d main -c "\dt"
+docker exec -it api-capi-zip-develop-postgresql-1 psql -U admin -d main -c "\d+ user"
+
+alembic revision --autogenerate -m  "table "
+alembic upgrade head
+
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=adminpass
+POSTGRES_DB=main
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYXJsb3NtaWd1ZWwuZHNhQGdtYWlsLmNvbSIsImV4cCI6MTcwMTM3MDkxOH0.Ydu-6xAR2wl1XvkYyk5AukP8L1ew-lZVVN8JzIOuC-A

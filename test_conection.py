@@ -11,11 +11,11 @@ def connect():
 
         # connect to the PostgreSQL server
         print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(host='127.0.0.1',database ='main',user='postgres',password='123',connect_timeout = 10)
+        conn = psycopg2.connect(host='127.0.0.1',database ='main',user='admin',password='adminpass',connect_timeout = 10)
         # create a cursor
-        print('antes')
+        print('antes conect')
         cur = conn.cursor()
-        print('depois')
+        print('depois conet')
     # execute a statement
         print('PostgreSQL database version:')
         cur.execute('SELECT version()')
@@ -23,7 +23,7 @@ def connect():
         # display the PostgreSQL database server version
         db_version = cur.fetchone()
         print(db_version)
-        print('olaaaa')
+        print('Deu certoooo')
     # close the communication with the PostgreSQL
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:

@@ -36,16 +36,6 @@ class Login(BaseModel):
     class config():
         from_attributes = True
 
-class ResetPassword(BaseModel):
-    id: int | None = None
-    user_id: Auth
-    status: StatusEnum
-    code: str
-
-    class config():
-        from_attributes = True
-
-
 class LinkShortIn(BaseModel):
     link_long: str
     short_link: str
@@ -55,6 +45,29 @@ class LinkShortIn(BaseModel):
 
 class LinkShortOut(BaseModel):
     link_long: str
+
+    class config():
+        from_attributes = True
+
+
+class ResetPasswordIn(BaseModel):
+    user_id: int
+    status: StatusEnum
+    code: str
+
+    class config():
+        from_attributes = True
+
+class ResetPasswordOut(BaseModel):
+    user_id: str
+    new_password: str
+
+    class config():
+        from_attributes = True
+
+class ResetPassword(BaseModel):
+    user_email: str 
+    new_password:str
 
     class config():
         from_attributes = True

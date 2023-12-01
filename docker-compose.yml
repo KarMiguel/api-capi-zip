@@ -5,8 +5,10 @@ services:
     image: postgres
     ports:
       - 5432:5432
-    env_file:
-      - ./.env
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "adminpass"
+      POSTGRES_DB: "main"
     volumes:
       - /var/cache/postgres_data:/var/lib/postgresql/data
   pgadmin:

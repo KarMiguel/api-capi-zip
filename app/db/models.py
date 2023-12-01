@@ -4,11 +4,11 @@ from sqlalchemy import Column,String, Integer,TIMESTAMP,text, ForeignKey
 from sqlalchemy.dialects.postgresql import ENUM as pgEnum
 from sqlalchemy.orm import relationship ,DeclarativeBase, Mapped,mapped_column
 from app.db.base import Base
-
+from typing import List
 
 class StatusReset(Enum):
-    done = 'done'
-    send = 'send'
+    done = "done"
+    send = "send"
 
 StatusResetType = pgEnum(StatusReset, name='status_reset', metadata=Base.metadata)
 
@@ -23,6 +23,7 @@ class UserModel(Base):
 
     auth : Mapped["AuthModel"]= relationship( back_populates="user")
     link_short: Mapped["LinkShortModel"] =  relationship( back_populates="user")
+    reset_passwords : Mapped[List["ResetPasswordModel"]] = relationship( back_populates="user")
 
 class AuthModel(Base):
     __tablename__ = 'auth'
@@ -39,4 +40,14 @@ class LinkShortModel(Base):
     short_link: Mapped[str]= mapped_column(primary_key=True,nullable=False,unique=True)
 
     user : Mapped["UserModel"] = relationship (back_populates="link_short")
+
+class ResetPasswordModel(Base):
+    __tablename__ = 'reset_password'
+
+    id : Mapped[int] = mapped_column(primary_key=True,autoincrement=True,nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id',ondelete='CASCADE'),nullable=False)
+    status : Mapped[StatusReset]= mapped_column(StatusResetType,nullable=False)
+    code : Mapped[str]= mapped_column(nullable=False)
+    new_password: Mapped[str] = mapped_column(nullable=False)
+    user: Mapped["UserModel"] = relationship(back_populates="reset_passwords")
 

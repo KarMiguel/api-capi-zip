@@ -82,14 +82,11 @@ class UserUseCases:
         msg.attach(MIMEText(body, 'plain'))
 
         try:
-            print(f"SMTP Server: {smtp_server}, Port: {smtp_port}")
             server = smtplib.SMTP(smtp_server, smtp_port)
             server.starttls()
 
-            print(f"Logging in with User: {smtp_user}, Password: {smtp_password}")
             server.login(smtp_user, smtp_password)
 
-            print(f"Sending email from {from_email} to {to_email}")
             server.sendmail(from_email, to_email, msg.as_string())
 
             print("Email sent successfully")

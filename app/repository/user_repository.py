@@ -89,7 +89,6 @@ class UserUseCases:
 
             server.sendmail(from_email, to_email, msg.as_string())
 
-            print("Email sent successfully")
             server.quit()
                 
         except smtplib.SMTPException as smtp_error:

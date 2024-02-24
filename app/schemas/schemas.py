@@ -71,3 +71,13 @@ class ResetPassword(BaseModel):
 
     class config():
         from_attributes = True
+
+
+class ClickIn(BaseModel):
+    user_agent: str
+    ip: str
+    localization: str
+
+    class Config:
+        from_attributes = True
+

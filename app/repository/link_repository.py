@@ -5,6 +5,7 @@ from app.schemas.schemas import Auth, LinkShortIn,  UserIn
 from sqlalchemy.sql.expression import select
 import random
 import string
+import os
 
 class RepositoryLink:
     def __init__(self,db_session:Session) :
@@ -29,8 +30,10 @@ class RepositoryLink:
 
         while True:
             novo_link = ''.join(random.sample(self.caracteres, 5))
-            novo_link_completo = f'https://cap-zip.com/{novo_link}'
-
+            DOMAIN_URL = os.getenv("DOMAIN_URL")
+            if not DOMAIN_URL:
+                raise ValueError("Domain not defined")
+            novo_link_completo = f'{DOMAIN_URL}/l/{novo_link}'
             if novo_link_completo not in self.links_gerados and not self.obter_short_link_generate(novo_link_completo):
                 self.links_gerados.add(novo_link_completo)
                 return novo_link_completo
@@ -40,12 +43,17 @@ class RepositoryLink:
         resultado = self.db_session.execute(query).scalars().all()
         return resultado
     
-    def obter_short_link_generate(self, link_long):
-        query = select(LinkShortModel.short_link).where(
-        LinkShortModel.link_long == link_long
+    def obter_short_link_generate(self, link):
+        DOMAIN_URL = os.getenv("DOMAIN_URL")
+        if not DOMAIN_URL:
+            raise ValueError("Domain not defined2")
+        link_short = f'{DOMAIN_URL}/l/{link}'
+        print(link_short)
+        query = select(LinkShortModel).where(
+        LinkShortModel.short_link == link_short
     )
         short_link_result = self.db_session.execute(query).scalar()
-    
+        print(short_link_result)
         short_link = short_link_result if short_link_result else None
     
         return short_link

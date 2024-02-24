@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "api-xapi-zip"
+name = "cap-zip"
 version = "0.1.0"
 description = "encurtador link"
 authors = ["KarMiguel <carlosmiguel.dsa12@gmail.com>"]
@@ -7,9 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = "^0.104.1"
 uvicorn = "^0.24.0.post1"
-sqlalchemy = "^2.0.23"
 alembic = "^1.12.1"
 python-decouple = "^3.8"
 passlib = "^1.7.4"
@@ -20,6 +18,8 @@ pydantic = "^2.5.1"
 pydantic-settings = "^2.1.0"
 python-dotenv = "^1.0.0"
 bcrypt = "^4.0.1"
+fastapi = "^0.109.0"
+sqlalchemy = "^2.0.25"
 
 
 [build-system]

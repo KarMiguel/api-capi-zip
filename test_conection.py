@@ -11,7 +11,8 @@ def connect():
 
         # connect to the PostgreSQL server
         print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(host='127.0.0.1',database ='main',user='admin',password='adminpass',connect_timeout = 10)
+        print('deu certo')
+        conn = psycopg2.connect(host='127.0.0.1',database ='main',user='postgres',password='adminpass',connect_timeout = 10)
         # create a cursor
         print('antes conect')
         cur = conn.cursor()

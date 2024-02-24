@@ -4,13 +4,13 @@ services:
   postgresql:
     image: postgres
     ports:
-      - 5432:5432
+      - 5433:5432
     environment:
-      POSTGRES_USER: "admin"
+      POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "adminpass"
-      POSTGRES_DB: "main"
+      POSTGRES_DB: "short_link_db"
     volumes:
-      - /var/cache/postgres_data:/var/lib/postgresql/data
+      - /var/cache/postgres_data:/var/lib/postgresql/data3
   pgadmin:
     image: dpage/pgadmin4
     environment:

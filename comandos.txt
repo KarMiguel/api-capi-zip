@@ -1,9 +1,9 @@
-docker run --name cap_zip -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=adminpass -d postgres:latest
-docker exec -it api-capi-zip-develop-postgresql-1  psql -U admin -d main -c "\dt"
-docker exec -it api-capi-zip-develop-postgresql-1 psql -U admin -d main -c "\d+ user"
-docker-compose up -d
+docker run --name capi-zip -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=adminpass -d postgres:latest
+docker exec -it capi-zip  psql -U admin -d main -c "\dt"
+docker exec -it api-capi-zip-develop-postgresql-1 psql -U postgres -d main -c "\d+ user"
 
-alembic revision --autogenerate -m  "table reset_password "
+uvicorn app.main:app --reload
+alembic revision --autogenerate -m  "add table click"
 alembic upgrade head
 htpps://myaccount.google.com/apppasswords
 

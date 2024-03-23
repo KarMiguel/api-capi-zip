@@ -74,10 +74,21 @@ class ResetPassword(BaseModel):
 
 
 class ClickIn(BaseModel):
-    user_agent: str
+    link_short_id: str 
+    user_agent: str | None
     ip: str
     localization: str
 
     class Config:
         from_attributes = True
 
+class ClickOut(BaseModel):
+    link_short_id: str 
+    user_agent: str | None
+    ip: str
+    localization: str
+    created_at: datetime | None
+
+
+    class Config:
+        from_attributes = True

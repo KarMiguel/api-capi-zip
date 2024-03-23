@@ -42,7 +42,7 @@ def login(login: Login, db_session=Depends(get_db_session)):
 
     if usuario and hash_providers.verificar_hash(senha, usuario.auth.password):
         token = token_providers.criar_access_token({'sub': usuario.email})
-        return {'user': usuario.id,"username":usuario.email,"acess":token}
+        return {"acess_token":token}
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Username or password incorrect!')

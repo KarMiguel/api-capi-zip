@@ -52,13 +52,15 @@ class ResetPasswordModel(Base):
     new_password: Mapped[str] = mapped_column(nullable=False)
     user: Mapped["UserModel"] = relationship(back_populates="reset_passwords")
 
+
 class ClickModel(Base):
     __tablename__ =  'click'
+
     id : Mapped[int] = mapped_column(primary_key=True,autoincrement=True,nullable=False)
-    link_short_id: Mapped[str] = mapped_column(ForeignKey('link_short.short_link',ondelete='CASCADE'),nullable=False,)
+    link_short_id: Mapped[str] = mapped_column(ForeignKey('link_short.short_link', ondelete='CASCADE'),nullable=False)
     user_agent: Mapped[str] = mapped_column(nullable=False)
     ip: Mapped[str] = mapped_column(nullable=False)
     localization: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=text('CURRENT_TIMESTAMP'), nullable=False)
 
-    link_short:Mapped["LinkShortModel"]  = relationship(back_populates="clicks")
+    link_short: Mapped["LinkShortModel"] = relationship(back_populates="clicks")

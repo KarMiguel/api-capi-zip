@@ -85,7 +85,7 @@ class ClickIn(BaseModel):
     link_short_id: str 
     user_agent: str | None
     ip: str
-    localization: str
+    localization: str | None
 
     class Config:
         from_attributes = True

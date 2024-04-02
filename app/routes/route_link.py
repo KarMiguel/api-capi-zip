@@ -12,7 +12,7 @@ from fastapi.responses import RedirectResponse
 router = APIRouter(prefix='/link')
 
 
-@router.post('/short_link')
+@router.post('/short_link',status_code=status.HTTP_201_CREATED)
 def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
    
     pattern = re.compile(r'^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/?.*$')
@@ -23,7 +23,6 @@ def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_us
 
     link_short_exist = RepositoryLink(db_session=db_session).obter_short_link(link.link_long,user_login.id)
 
-
     link_novo = LinkShortIn(link_long=link.link_long, short_link="")  
    
     if link_short_exist:
@@ -33,10 +32,10 @@ def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_us
     if not link_short_exist:
         link_novo.short_link = RepositoryLink(db_session=db_session).generate_link_short()
         link_salve = RepositoryLink(db_session=db_session).salve_link(link_novo, user_login.id)
-        return {"link_log": link_salve.link_long, "link_short": link_salve.short_link}
-    
+        return {"link_log": link_salve.link_long, "link_short": link_salve.short_link}    
 
-@router.get('/me_link_short/', response_model=list[MeLinkShort])
+
+@router.get('/me_link_short/', response_model=list[MeLinkShort],status_code=status.HTTP_200_OK)
 def list_link(user: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
     repository_link = RepositoryLink(db_session=db_session)
     links = repository_link.list_all_short_link(user.id)

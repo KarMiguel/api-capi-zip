@@ -12,24 +12,26 @@ from datetime import datetime
 
 router = APIRouter(prefix='/user')
 
-@router.post('/register')
+@router.post('/register',status_code=status.HTTP_201_CREATED)
 def register_user(user:Auth, db_session :Session = Depends(get_db_session)):
     
     located = UserUseCases(db_session = db_session).obter_por_usuario(user.email)
     
     if located :
-         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='User already exists with this email')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User already exists with this email'
+        )
     
     user.password = hash_providers.gerar_hash(user.password)
-    uc  = UserUseCases(db_session = db_session).register(user)
+    UserUseCases(db_session = db_session).register(user)
    
-    return {"id": uc.id, "user": uc.email}
+    return {'message': 'User created successfully'}
 
 
 
 
-@router.post('/login')
+@router.post('/login',status_code=status.HTTP_200_OK)
 def login(login: Login, db_session=Depends(get_db_session)):
     senha = login.password
     username = login.username
@@ -42,12 +44,12 @@ def login(login: Login, db_session=Depends(get_db_session)):
 
     if usuario and hash_providers.verificar_hash(senha, usuario.auth.password):
         token = token_providers.criar_access_token({'sub': usuario.email})
-        return {"acess_token":token}
+        return {"access_token":token}
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Username or password incorrect!')
 
-@router.post('/reset_password',status_code = 204)
+@router.patch('/reset_password',status_code = status.HTTP_200_OK)
 def reset_password( user: ResetPassword, db_session: Session = Depends(get_db_session)):
     
     uc = UserUseCases(db_session=db_session).obter_por_usuario(user.user_email)
@@ -75,6 +77,7 @@ def reset_password( user: ResetPassword, db_session: Session = Depends(get_db_se
         )
     db_session.commit()
     return {'msg':'Confirmation code sent in email'}
+
         
 @router.get('/valid_reset')
 def valid_reset( email:str,code:str,db_session: Session = Depends(get_db_session)):
@@ -91,9 +94,3 @@ def valid_reset( email:str,code:str,db_session: Session = Depends(get_db_session
     db_session.commit()
 
     return {'msg':'Password reset successfully'}
-
-
-
-@router.get('/me', response_model=Login)
-def me(usuario: Auth = Depends(obter_usuario_logado)):
-    return usuario

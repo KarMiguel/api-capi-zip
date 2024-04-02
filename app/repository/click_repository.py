@@ -6,7 +6,6 @@ from app.schemas.schemas import ClickIn
 from app.db.models import ClickModel,LinkShortModel
 from datetime import datetime
 from sqlalchemy.sql.expression import select
-import socket
 
 class RepositoryClick:
     def __init__(self, db_session: Session):
@@ -29,12 +28,6 @@ class RepositoryClick:
         self.db_session.refresh(click_model)
 
         return click_model
-
-
-    def get_local_ip():
-        hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(hostname)
-        return local_ip
         
     def list_all_click_link(self, short_link: str):
         return self.db_session.query(ClickModel).filter(ClickModel.link_short_id == short_link)
@@ -46,3 +39,6 @@ class RepositoryClick:
             if link.user_id == user_id:
                 return True
         return False
+    
+    
+        

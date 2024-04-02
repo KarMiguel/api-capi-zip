@@ -7,6 +7,8 @@ from sqlalchemy.sql.expression import select
 import random
 import string
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 class RepositoryLink:
     def __init__(self,db_session:Session) :

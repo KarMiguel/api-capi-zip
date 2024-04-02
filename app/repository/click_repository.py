@@ -40,11 +40,7 @@ class RepositoryClick:
         return self.db_session.query(ClickModel).filter(ClickModel.link_short_id == short_link)
     
     def check_user_has_access(self, user_id: int, short_link: str) -> bool:
-        """
-        Verifica se o usuário tem acesso aos cliques associados a um determinado short_link.
-        Retorna True se o usuário tem acesso, False caso contrário.
-        """
-        # Obter o usuário associado ao short_link
+       
         link = self.db_session.query(LinkShortModel).filter(LinkShortModel.short_link == short_link).first()
         if link:
             if link.user_id == user_id:

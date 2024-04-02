@@ -43,6 +43,14 @@ class LinkShortIn(BaseModel):
     class config():
         from_attributes = True
 
+class MeLinkShort(BaseModel):
+    link_long: str
+    short_link: str
+    qtd_clicks:int
+
+    class config():
+        from_attributes = True
+
 class LinkShortOut(BaseModel):
     link_long: str
 

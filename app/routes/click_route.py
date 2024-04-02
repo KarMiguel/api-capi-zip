@@ -12,20 +12,26 @@ from fastapi import HTTPException
 from geopy.geocoders import Nominatim
 from starlette.requests import Request
 from sqlalchemy.orm.query import Query
-router = APIRouter()
 
-def get_city_from_ip(request: Request) -> str:
-    ip = request.client.host
+router = APIRouter()
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut, GeocoderUnavailable
+
+def get_location_from_ip(ip_address: str) -> str:
     try:
-        geolocator = Nominatim(user_agent="fastapi_app")
-        location = geolocator.geocode(ip)
-        if location and hasattr(location, 'address'):
-            city = location.address.split(",")[-3].strip()  
-            return city
+        geolocator = Nominatim(user_agent="geoapiExercises")
+        location = geolocator.reverse(ip_address)
+        if location:
+            return location.address
         else:
-            return "Unknown"
+            return "Location not found"
+    except (GeocoderTimedOut, GeocoderUnavailable) as e:
+        print(f"Error: Geocoding service timed out or unavailable - {e}")
+        return "Location service unavailable"
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to retrieve city from IP.") from e
+        print(f"Error: {e}")
+        return "São francisco - MG"
+
 
 @router.get('/l/{short_link}',response_class=RedirectResponse)
 def redirect_to_original_link(short_link: str, request: Request, db_session: Session = Depends(get_db_session)):
@@ -36,8 +42,8 @@ def redirect_to_original_link(short_link: str, request: Request, db_session: Ses
     
     ip = request.client.host
     user_agent = request.headers.get('user-agent') 
-    localization = get_city_from_ip(request) or "São Francisco - MG"
-
+    localization =  get_location_from_ip(ip) or "São Francisco - MG"
+    
     print("Shor Link: ",short_link)    
     print("IP: ",ip)
     print("User_agent: ",user_agent)
@@ -56,7 +62,7 @@ def redirect_to_original_link(short_link: str, request: Request, db_session: Ses
 @router.get('/me_click_short', response_model=list[ClickOut])
 def list_click_short(short_link: str,user: UserModel = Depends(obter_usuario_logado),db_session: Session = Depends(get_db_session)):
     if not RepositoryClick(db_session).check_user_has_access(user.id, short_link):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User does not have access to clicks for this short link")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User does not have access to clicks for this short link")
 
     clicks: Query = RepositoryClick(db_session).list_all_click_link(short_link)
     return clicks.all()

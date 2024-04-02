@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from app.db.models import LinkShortModel
 from sqlalchemy.orm  import Session
 from app.db.depends import  get_db_session
@@ -38,10 +39,6 @@ class RepositoryLink:
                 self.links_gerados.add(novo_link_completo)
                 return novo_link_completo
     
-    def list_all_short_link(self, user_id: int):
-        query = select(LinkShortModel).where(LinkShortModel.user_id == user_id)
-        resultado = self.db_session.execute(query).scalars().all()
-        return resultado
     
     def obter_short_link_generate(self, link):
         DOMAIN_URL = os.getenv("DOMAIN_URL")
@@ -57,3 +54,23 @@ class RepositoryLink:
         short_link = short_link_result if short_link_result else None
     
         return short_link
+    
+    def obter_short_link(self, link_long, user_id):
+        existing_link = self.db_session.query(LinkShortModel).filter(
+            LinkShortModel.link_long == link_long,
+            LinkShortModel.user_id == user_id
+        ).first()
+
+        if existing_link:
+            return existing_link.short_link
+        else:
+            return None
+    
+    def count_clicks(self, short_link):
+        return self.db_session.query(func.count()).join(LinkShortModel.clicks).filter(LinkShortModel.short_link == short_link).scalar()
+
+    def list_all_short_link(self, user_id: int):
+        query = select(LinkShortModel).where(LinkShortModel.user_id == user_id)
+        resultado = self.db_session.execute(query).scalars().all()
+        return resultado
+

@@ -15,7 +15,7 @@ router = APIRouter(prefix='/link')
 @router.post('/short_link',status_code=status.HTTP_201_CREATED)
 def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
    
-    pattern = re.compile(r'^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/?.*$')
+    pattern = re.compile(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$')
 
     if not pattern.match(link.link_long):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -35,6 +35,30 @@ def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_us
         return {"link_log": link_salve.link_long, "link_short": link_salve.short_link}    
 
 
+@router.post('/short_link_sem_auth',status_code=status.HTTP_201_CREATED)
+def short_link(link: LinkShortOut,db_session: Session = Depends(get_db_session)):
+   
+    pattern = re.compile(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$')
+
+    if not pattern.match(link.link_long):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail="The link provided is not in web format")
+
+    link_short_exist = RepositoryLink(db_session=db_session).obter_short_link_sem_auth(link.link_long)
+
+    link_novo = LinkShortIn(link_long=link.link_long, short_link="")  
+   
+    if link_short_exist:
+        link_novo.short_link = link_short_exist
+        return {"link_long": link_novo.link_long,"link_short": link_short_exist}
+
+    if not link_short_exist:
+        link_novo.short_link = RepositoryLink(db_session=db_session).generate_link_short()
+        link_salve = RepositoryLink(db_session=db_session).salve_link(link_novo, 1)
+        return {"link_log": link_salve.link_long, "link_short": link_salve.short_link}    
+
+
+
 @router.get('/me_link_short/', response_model=list[MeLinkShort],status_code=status.HTTP_200_OK)
 def list_link(user: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
     repository_link = RepositoryLink(db_session=db_session)
@@ -42,9 +66,17 @@ def list_link(user: UserModel = Depends(obter_usuario_logado), db_session: Sessi
 
     me_links = []
     for link in links:
-        qtd_clicks = repository_link.count_clicks(link.short_link)
+        qtd_clicks = repository_link.count_clicks_By_short_link(link.short_link)
         me_link = MeLinkShort(link_long=link.link_long, short_link=link.short_link, qtd_clicks=qtd_clicks)
         me_links.append(me_link)
     
     return me_links
+
+
+@router.delete('/delete_short_link/', status_code=status.HTTP_204_NO_CONTENT)
+def delete_short_link(short_link: str, user_login: UserModel = Depends(obter_usuario_logado),  db_session: Session = Depends(get_db_session)):
+    deleted = RepositoryLink(db_session=db_session).delete_short_link(short_link)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Short link not found")
+    return {"msg": "delete success"}
 

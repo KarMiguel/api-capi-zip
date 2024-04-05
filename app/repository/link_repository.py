@@ -1,5 +1,6 @@
+from operator import and_
 from sqlalchemy import func
-from app.db.models import LinkShortModel
+from app.db.models import LinkShortModel,ClickModel
 from sqlalchemy.orm  import Session
 from app.db.depends import  get_db_session
 from app.schemas.schemas import Auth, LinkShortIn,  UserIn
@@ -68,11 +69,44 @@ class RepositoryLink:
         else:
             return None
     
-    def count_clicks(self, short_link):
+    def obter_short_link_sem_auth(self, link_long):
+        existing_link = self.db_session.query(LinkShortModel).filter(
+            LinkShortModel.link_long == link_long
+        ).first()
+
+        if existing_link:
+            return existing_link.short_link
+        else:
+            return None
+    
+    def count_clicks_By_short_link(self, short_link):
         return self.db_session.query(func.count()).join(LinkShortModel.clicks).filter(LinkShortModel.short_link == short_link).scalar()
 
     def list_all_short_link(self, user_id: int):
         query = select(LinkShortModel).where(LinkShortModel.user_id == user_id)
         resultado = self.db_session.execute(query).scalars().all()
         return resultado
-
+    
+    def delete_short_link(self, short_link):
+        link = self.db_session.query(LinkShortModel).filter(LinkShortModel.short_link == short_link).first()
+        if link:
+            self.db_session.query(ClickModel).filter(ClickModel.link_short_id == short_link).delete()
+            self.db_session.delete(link)
+            self.db_session.commit()
+            return True
+        return False
+    
+    def short_link_By_Id(self, user_id: int,link):
+        query = select(LinkShortModel).where(
+            and_(
+                LinkShortModel.user_id != user_id,
+                LinkShortModel.short_link == link.short_link
+            )
+        )
+        resultado = self.db_session.execute(query).scalars().all()
+        return resultado
+    
+    def count_clicks(self):
+        return self.db_session.query(func.count(LinkShortModel.short_link)).scalar()
+    
+        

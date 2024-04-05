@@ -1,11 +1,11 @@
 from fastapi import HTTPException,status
 from sqlalchemy.orm import Session
-from app.db.depends import get_db_session
 from app.repository.link_repository import RepositoryLink
 from app.schemas.schemas import ClickIn
 from app.db.models import ClickModel,LinkShortModel
 from datetime import datetime
-from sqlalchemy.sql.expression import select
+from sqlalchemy import desc,func
+
 
 class RepositoryClick:
     def __init__(self, db_session: Session):
@@ -30,8 +30,19 @@ class RepositoryClick:
         return click_model
         
     def list_all_click_link(self, short_link: str):
-        return self.db_session.query(ClickModel).filter(ClickModel.link_short_id == short_link)
-    
+        return (
+            self.db_session.query(
+                ClickModel.link_short_id,
+                func.count(ClickModel.id).label("num_clicks")
+            )
+            .filter(ClickModel.link_short_id == short_link)
+            .group_by(ClickModel.link_short_id)
+            .order_by(func.count(ClickModel.id).desc())
+        )
+
+
+
+
     def check_user_has_access(self, user_id: int, short_link: str) -> bool:
        
         link = self.db_session.query(LinkShortModel).filter(LinkShortModel.short_link == short_link).first()
@@ -40,5 +51,5 @@ class RepositoryClick:
                 return True
         return False
     
-    
+  
         

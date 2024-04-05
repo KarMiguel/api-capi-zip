@@ -64,3 +64,4 @@ class ClickModel(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=text('CURRENT_TIMESTAMP'), nullable=False)
 
     link_short: Mapped["LinkShortModel"] = relationship(back_populates="clicks")
+

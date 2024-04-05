@@ -57,7 +57,7 @@ class UserUseCases:
 
     def get_reset_password(self,email,code)->ResetPasswordModel | None:
         query = (select(ResetPasswordModel).join(UserModel.reset_passwords).
-        where(ResetPasswordModel.code==code).where(UserModel.email ==email))
+        where(ResetPasswordModel.code==code).where(UserModel.email == email))
         return self.db_session.execute(query).scalar()
 
 

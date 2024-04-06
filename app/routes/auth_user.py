@@ -1,16 +1,16 @@
 import secrets
 from fastapi import APIRouter,Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.db.models import ResetPasswordModel, StatusReset
-from app.routes.auth_util import obter_usuario_logado 
-from app.db.depends import get_db_session
+from app.entity.models import ResetPasswordModel, StatusReset
+from app.utils.email_util import * 
+from app.entity.depends import get_db_session
 from app.repository.user_repository import UserUseCases
 from app.schemas.schemas import ResetPassword, ResetPasswordIn,  StatusEnum, Auth, Login
 from app.providers import hash_providers,token_providers
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
-router = APIRouter(prefix='/user')
+router = APIRouter(prefix='/api/v1/user')
 
 @router.post('/register',status_code=status.HTTP_201_CREATED)
 def register_user(user:Auth, db_session :Session = Depends(get_db_session)):
@@ -20,13 +20,13 @@ def register_user(user:Auth, db_session :Session = Depends(get_db_session)):
     if located :
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='User already exists with this email'
+            detail='Já existe um usuário com este e-mail'
         )
     
     user.password = hash_providers.gerar_hash(user.password)
     UserUseCases(db_session = db_session).register(user)
    
-    return {'message': 'User created successfully'}
+    return {'message': 'Usuário criado com Sucesso!'}
 
 
 
@@ -40,28 +40,38 @@ def login(login: Login, db_session=Depends(get_db_session)):
 
     if not usuario:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='There is no user with that username!')
+                            detail='Não há nenhum usuário com esse email!')
 
     if usuario and hash_providers.verificar_hash(senha, usuario.auth.password):
         token = token_providers.criar_access_token({'sub': usuario.email})
         return {"access_token":token}
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail='Username or password incorrect!')
+                            detail='Username ou senha incorreta!')
 
-@router.patch('/reset_password',status_code = status.HTTP_200_OK)
+@router.patch('/reset-password',status_code = status.HTTP_200_OK)
 def reset_password( user: ResetPassword, db_session: Session = Depends(get_db_session)):
     
-    uc = UserUseCases(db_session=db_session).obter_por_usuario(user.user_email)
+    user_repository = UserUseCases(db_session=db_session)
+    uc = user_repository.obter_por_usuario(user.user_email)
     if not uc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail='user not register!')
 
-    
+    latest_reset_code = user_repository.get_latest_reset_password(user.user_email)
+    if latest_reset_code and latest_reset_code.status == StatusEnum.send:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail='Um código de redefinição já foi enviado ao seu email.'
+            )
+
+
     user_reset = ResetPasswordModel(
         code=secrets.token_urlsafe(24),
         status = StatusEnum.send,
-        new_password = hash_providers.gerar_hash(user.new_password)
+        new_password = hash_providers.gerar_hash(user.new_password),
+        created_at=datetime.utcnow() + timedelta(hours=1) 
+
     )
     uc.reset_passwords.append(user_reset)
     
@@ -69,28 +79,44 @@ def reset_password( user: ResetPassword, db_session: Session = Depends(get_db_se
         to_email = user.user_email
         subject = f'Redefinição de senha'
         body = f'Confirme o código para prosseguir!\nCódigo = {user_reset.code}'
-        UserUseCases(db_session=db_session).send_email(to_email, subject, body)
+        send_email(to_email, subject, body)
     except Exception as e:
        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'Erro ao enviar e-mail de redefinição de senha:{str(e)}'
         )
     db_session.commit()
-    return {'msg':'Confirmation code sent in email'}
+    return {'msg':'Código de confirmação enviado por e-mail.'}
 
         
-@router.get('/valid_reset')
+@router.get('/reset-password/validate')
 def valid_reset( email:str,code:str,db_session: Session = Depends(get_db_session)):
     
-    user_reset = UserUseCases(db_session=db_session).get_reset_password(email,code)
-    
+    user_repository = UserUseCases(db_session=db_session)
+    user_reset = user_repository.get_reset_password(email, code)
+        
     if not user_reset:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'user not foud'
+            detail='Usuário não encontrado ou código de redefinição inválido'
         )
+    
+    latest_reset_code = user_repository.get_latest_reset_password(email)
+    if user_reset != latest_reset_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='O código de redefinição fornecido já expirado.'
+        )
+    
+    if user_reset.status == StatusEnum.done:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='A senha já foi redefinida com este código.'
+        )
+    
+
     user_reset.user.auth.password = user_reset.new_password
     user_reset.status = StatusReset.done
     db_session.commit()
 
-    return {'msg':'Password reset successfully'}
+    return {'msg':'Senha redefinida com sucesso!'}

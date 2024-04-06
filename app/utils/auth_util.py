@@ -3,7 +3,7 @@ from fastapi.param_functions import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from starlette import status
-from app.db.depends import  get_db_session
+from app.entity.depends import  get_db_session
 from app.providers import token_providers
 from jose import JWTError
 from app.repository.user_repository import UserUseCases

@@ -1,8 +1,8 @@
 from operator import and_
 from sqlalchemy import func
-from app.db.models import LinkShortModel,ClickModel
+from app.entity.models import LinkShortModel,ClickModel
 from sqlalchemy.orm  import Session
-from app.db.depends import  get_db_session
+from app.entity.depends import  get_db_session
 from app.schemas.schemas import Auth, LinkShortIn,  UserIn
 from sqlalchemy.sql.expression import select
 import random
@@ -37,10 +37,10 @@ class RepositoryLink:
             DOMAIN_URL = os.getenv("DOMAIN_URL")
             if not DOMAIN_URL:
                 raise ValueError("Domain not defined")
-            novo_link_completo = f'{DOMAIN_URL}/l/{novo_link}'
-            if novo_link_completo not in self.links_gerados and not self.obter_short_link_generate(novo_link_completo):
-                self.links_gerados.add(novo_link_completo)
-                return novo_link_completo
+            new_full_link = f'{DOMAIN_URL}/l/{novo_link}'
+            if new_full_link not in self.links_gerados and not self.obter_short_link_generate(new_full_link):
+                self.links_gerados.add(new_full_link)
+                return new_full_link
     
     
     def obter_short_link_generate(self, link):
@@ -105,8 +105,8 @@ class RepositoryLink:
         )
         resultado = self.db_session.execute(query).scalars().all()
         return resultado
-    
-    def count_clicks(self):
+   
+    def count_short_links(self):
         return self.db_session.query(func.count(LinkShortModel.short_link)).scalar()
-    
+
         

@@ -3,7 +3,7 @@ from enum import Enum
 from sqlalchemy import Column,String, Integer,TIMESTAMP,text, ForeignKey
 from sqlalchemy.dialects.postgresql import ENUM as pgEnum
 from sqlalchemy.orm import relationship ,DeclarativeBase, Mapped,mapped_column
-from app.db.base import Base
+from app.entity.base import Base
 from typing import List
 
 class StatusReset(Enum):
@@ -50,6 +50,9 @@ class ResetPasswordModel(Base):
     status : Mapped[StatusReset]= mapped_column(StatusResetType,nullable=False)
     code : Mapped[str]= mapped_column(nullable=False)
     new_password: Mapped[str] = mapped_column(nullable=False)
+    created_at : Mapped[datetime] = mapped_column(server_default=text('CURRENT_TIMESTAMP'), nullable=False)
+    
+   
     user: Mapped["UserModel"] = relationship(back_populates="reset_passwords")
 
 

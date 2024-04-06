@@ -2,7 +2,7 @@ from fastapi import HTTPException,status
 from sqlalchemy.orm import Session
 from app.repository.link_repository import RepositoryLink
 from app.schemas.schemas import ClickIn
-from app.db.models import ClickModel,LinkShortModel
+from app.entity.models import ClickModel,LinkShortModel
 from datetime import datetime
 from sqlalchemy import desc,func
 
@@ -50,6 +50,11 @@ class RepositoryClick:
             if link.user_id == user_id:
                 return True
         return False
+    
+     
+    def count_clicks(self):
+        return self.db_session.query(func.count(ClickModel.link_short_id)).scalar()
+    
     
   
         

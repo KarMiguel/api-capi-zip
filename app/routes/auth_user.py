@@ -56,7 +56,7 @@ def reset_password( user: ResetPassword, db_session: Session = Depends(get_db_se
     uc = user_repository.obter_por_usuario(user.user_email)
     if not uc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='user not register!')
+                            detail='Usuário não cadastrado!')
 
     latest_reset_code = user_repository.get_latest_reset_password(user.user_email)
     if latest_reset_code and latest_reset_code.status == StatusEnum.send:

@@ -15,11 +15,14 @@ router = APIRouter(prefix='/api/v1/link')
 @router.post('/shorten-link',status_code=status.HTTP_201_CREATED)
 def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
    
-    pattern = re.compile(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$')
+    if link.link_long == None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Link vazio.")
 
+    pattern = re.compile(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$')
     if not pattern.match(link.link_long):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                             detail="O link fornecido não está em formato web.")
+                             detail="Link inválido, não está em formato web.")
 
     link_short_exist = RepositoryLink(db_session=db_session).obter_short_link(link.link_long,user_login.id)
 
@@ -35,7 +38,7 @@ def short_link_auth(link: LinkShortOut, user_login: UserModel = Depends(obter_us
         return {"link_log": link_salve.link_long, "link_short": link_salve.short_link}    
 
 
-@router.post('/shorten-link-auth',status_code=status.HTTP_201_CREATED)
+@router.post('/shorten-link-no-auth',status_code=status.HTTP_201_CREATED)
 def short_link(link: LinkShortOut,db_session: Session = Depends(get_db_session)):
    
     pattern = re.compile(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$')

@@ -61,8 +61,8 @@ def list_click_short(short_link: str,user: UserModel = Depends(obter_usuario_log
             detail=f"{user.email}, você não tem acesso aos cliques deste link encurtado."
             )
 
-    clicks: Query = RepositoryClick(db_session).list_all_click_link(short_link)
-    return clicks.all()
+    clicks =  RepositoryClick(db_session).list_all_click_link(short_link)
+    return clicks
 
 
 @router.get('/api/v1/total-clicks')

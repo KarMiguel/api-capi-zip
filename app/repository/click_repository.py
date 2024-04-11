@@ -30,18 +30,8 @@ class RepositoryClick:
         return click_model
         
     def list_all_click_link(self, short_link: str):
-        return (
-            self.db_session.query(
-                ClickModel.link_short_id,
-                func.count(ClickModel.id).label("num_clicks")
-            )
-            .filter(ClickModel.link_short_id == short_link)
-            .group_by(ClickModel.link_short_id)
-            .order_by(func.count(ClickModel.id).desc())
-        )
-
-
-
+        return self.db_session.query(ClickModel).filter(ClickModel.link_short_id == short_link)
+      
 
     def check_user_has_access(self, user_id: int, short_link: str) -> bool:
        

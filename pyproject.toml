@@ -23,6 +23,7 @@ sqlalchemy = "^2.0.25"
 geopy = "^2.4.1"
 requests = "^2.31.0"
 deep-translator = "^1.11.4"
+terraform-local = "^0.18.1"
 
 
 [build-system]

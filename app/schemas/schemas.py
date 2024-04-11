@@ -95,8 +95,18 @@ class ClickOut(BaseModel):
     user_agent: str | None
     ip: str
     localization: str
-    created_at: datetime | None
+    created_at: datetime | None 
 
+    @validator('created_at', pre=True, always=True)
+    def parse_date(cls, value):
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+        return value
 
     class Config:
-        from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.strftime("%d/%m/%Y %H:%M:%S") if v else None
+        }
+        

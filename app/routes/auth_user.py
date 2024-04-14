@@ -77,9 +77,7 @@ def reset_password( user: ResetPassword, db_session: Session = Depends(get_db_se
     
     try:
         to_email = user.user_email
-        subject = f'Redefinição de senha'
-        body = f'Confirme o código para prosseguir!\nCódigo = {user_reset.code}'
-        send_email(to_email, subject, body)
+        send_email(to_email, user_reset.code)
     except Exception as e:
        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -4,7 +4,7 @@ from app.entity.models import LinkShortModel,ClickModel
 from sqlalchemy.orm  import Session
 from app.entity.depends import  get_db_session
 from app.schemas.schemas import Auth, LinkShortIn,  UserIn
-from sqlalchemy.sql.expression import select
+from sqlalchemy.sql.expression import select,desc
 import random
 import string
 import os
@@ -87,6 +87,26 @@ class RepositoryLink:
         resultado = self.db_session.execute(query).scalars().all()
         return resultado
     
+    def list_all_short_link_ordered_by_clicks(self, user_id: int):
+        subquery = (
+            self.db_session.query(
+                ClickModel.link_short_id,
+                func.count(ClickModel.id).label('click_count')
+            )
+            .group_by(ClickModel.link_short_id)
+            .subquery()
+        )
+
+        query = (
+            self.db_session.query(LinkShortModel)
+            .join(subquery, LinkShortModel.short_link == subquery.c.link_short_id)
+            .order_by(subquery.c.click_count.desc())
+            .filter(LinkShortModel.user_id == user_id)
+        )
+
+        resultado = query.all()
+        return resultado
+
     def delete_short_link(self, short_link):
         link = self.db_session.query(LinkShortModel).filter(LinkShortModel.short_link == short_link).first()
         if link:

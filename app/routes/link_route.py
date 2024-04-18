@@ -65,7 +65,7 @@ def short_link(link: LinkShortOut,db_session: Session = Depends(get_db_session))
 @router.get('/my-link-short', response_model=list[MeLinkShort],status_code=status.HTTP_200_OK)
 def list_link(user: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
     repository_link = RepositoryLink(db_session=db_session)
-    links = repository_link.list_all_short_link(user.id)
+    links = repository_link.list_all_short_link_ordered_by_clicks(user.id)
 
     me_links = []
     for link in links:
@@ -74,7 +74,6 @@ def list_link(user: UserModel = Depends(obter_usuario_logado), db_session: Sessi
         me_links.append(me_link)
     
     return me_links
-
 
 @router.delete('/delete-short-link', status_code=status.HTTP_204_NO_CONTENT)
 def delete_short_link(short_link: str, UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):

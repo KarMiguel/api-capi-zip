@@ -6,7 +6,7 @@ from app.utils.auth_util import obter_usuario_logado
 from app.repository.link_repository import RepositoryLink
 from fastapi.responses import RedirectResponse
 from app.repository.click_repository import RepositoryClick, LinkShortModel
-from app.schemas.schemas import ClickIn,ClickOut
+from app.schemas.schemas import ClickIn,ClickOut,ClickCity,ClickByPeriod,ClickByCityPeriod
 from fastapi import HTTPException
 from starlette.requests import Request
 from sqlalchemy.orm.query import Query
@@ -71,3 +71,32 @@ def total_clicks(db_session: Session = Depends(get_db_session)):
     return {"total":total}
 
 
+
+@router.get('/api/v1/clicks-by-city', response_model=list[ClickCity], status_code=status.HTTP_200_OK)
+def get_clicks_by_city(link: str,user :UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
+    if not RepositoryClick(db_session).check_user_has_access(user.id, link):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"{user.email}, você não tem acesso aos cliques deste link encurtado."
+            )
+
+    
+    repository_click = RepositoryClick(db_session=db_session)
+    clicks_info = repository_click.get_clicks_by_city(link)
+
+    return clicks_info
+
+@router.get('/api/v1/clicks-by-period', response_model=list[ClickByPeriod], status_code=status.HTTP_200_OK)
+def get_clicks_by_periodo(link: str,user: UserModel = Depends(obter_usuario_logado), db_session: Session = Depends(get_db_session)):
+    if not RepositoryClick(db_session).check_user_has_access(user.id, link):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"{user.email}, você não tem acesso aos cliques deste link encurtado."
+            )
+
+    repository_click = RepositoryClick(db_session=db_session)
+    manha_clicks, tarde_clicks, noite_clicks = repository_click.get_clicks_by_period(link)
+
+    return [
+            ClickByPeriod(qtd_click_manha=manha_clicks, qtd_click_tarde=tarde_clicks, qtd_click_noite=noite_clicks)
+        ]

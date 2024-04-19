@@ -110,3 +110,25 @@ class ClickOut(BaseModel):
             datetime: lambda v: v.strftime("%d/%m/%Y %H:%M:%S") if v else None
         }
         
+    
+class ClickCity(BaseModel):
+    city: str 
+    qtd_clicks: int
+
+    class Config:
+        from_attributes = True
+
+class ClickByPeriod(BaseModel):
+    qtd_click_manha: int
+    qtd_click_tarde: int 
+    qtd_click_noite: int
+
+
+    class Config:
+        from_attributes = True
+
+class ClickByCityPeriod(BaseModel):
+    city: str 
+    qtd_click_manha: int
+    qtd_click_tarde: int 
+    qtd_click_noite: int

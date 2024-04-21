@@ -1,5 +1,5 @@
 from sqlalchemy.orm  import Session
-from app.entity.models import UserModel,AuthModel,ResetPasswordModel
+from app.db.model.models import UserModel,AuthModel,ResetPasswordModel
 from app.schemas.schemas import ResetPasswordIn, UserIn, Auth
 from sqlalchemy import select
 from datetime import datetime

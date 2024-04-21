@@ -1,12 +1,12 @@
 from fastapi import APIRouter,Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.utils.auth_util import obter_usuario_logado 
-from app.entity.depends import get_db_session
+from app.db.depends import get_db_session
 from app.repository.link_repository import RepositoryLink
 from app.schemas.schemas import LinkShortOut
 from app.schemas.schemas import LinkShortIn,LinkShortOut,MeLinkShort
 import re
-from app.entity.models import UserModel
+from app.db.model.models import UserModel
 from fastapi.responses import RedirectResponse
 
 router = APIRouter(prefix='/api/v1/link')

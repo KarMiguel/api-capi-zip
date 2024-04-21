@@ -1,9 +1,9 @@
 import secrets
 from fastapi import APIRouter,Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.entity.models import ResetPasswordModel, StatusReset
+from app.db.model.models import ResetPasswordModel, StatusReset
 from app.utils.email_util import * 
-from app.entity.depends import get_db_session
+from app.db.depends import get_db_session
 from app.repository.user_repository import UserUseCases
 from app.schemas.schemas import ResetPassword, ResetPasswordIn,  StatusEnum, Auth, Login
 from app.providers import hash_providers,token_providers

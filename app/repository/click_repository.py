@@ -2,7 +2,7 @@ from fastapi import HTTPException,status
 from sqlalchemy.orm import Session
 from app.repository.link_repository import RepositoryLink
 from app.schemas.schemas import*
-from app.entity.models import ClickModel,LinkShortModel
+from app.db.model.models import ClickModel,LinkShortModel
 from datetime import datetime,time
 from sqlalchemy import func, case
 

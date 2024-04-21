@@ -1,8 +1,8 @@
 from operator import and_
 from sqlalchemy import func
-from app.entity.models import LinkShortModel,ClickModel
+from app.db.model.models import LinkShortModel,ClickModel
 from sqlalchemy.orm  import Session
-from app.entity.depends import  get_db_session
+from app.db.depends import  get_db_session
 from app.schemas.schemas import Auth, LinkShortIn,  UserIn
 from sqlalchemy.sql.expression import select,desc
 import random

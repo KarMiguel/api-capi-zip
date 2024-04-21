@@ -127,8 +127,3 @@ class ClickByPeriod(BaseModel):
     class Config:
         from_attributes = True
 
-class ClickByCityPeriod(BaseModel):
-    city: str 
-    qtd_click_manha: int
-    qtd_click_tarde: int 
-    qtd_click_noite: int

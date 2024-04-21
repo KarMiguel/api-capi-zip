@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header, Request
 from sqlalchemy.orm import Session
-from app.entity.depends import get_db_session
-from app.entity.models import UserModel
+from app.db.depends import get_db_session
+from app.db.model.models import UserModel
 from app.utils.auth_util import obter_usuario_logado 
 from app.repository.link_repository import RepositoryLink
 from fastapi.responses import RedirectResponse
 from app.repository.click_repository import RepositoryClick, LinkShortModel
-from app.schemas.schemas import ClickIn,ClickOut,ClickCity,ClickByPeriod,ClickByCityPeriod
+from app.schemas.schemas import ClickIn,ClickOut,ClickCity,ClickByPeriod
 from fastapi import HTTPException
 from starlette.requests import Request
 from sqlalchemy.orm.query import Query
